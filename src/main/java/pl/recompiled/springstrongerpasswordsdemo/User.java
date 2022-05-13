@@ -3,6 +3,7 @@ package pl.recompiled.springstrongerpasswordsdemo;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.With;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -36,9 +38,17 @@ class User implements UserDetails {
         return user;
     }
 
+    public User withPassword(String password) {
+        final User user = new User();
+        user.id = this.id;
+        user.username = this.username;
+        user.password = password;
+        return user;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Arrays.asList(new SimpleGrantedAuthority("USER"));
+        return List.of(new SimpleGrantedAuthority("USER"));
     }
 
     @Override
