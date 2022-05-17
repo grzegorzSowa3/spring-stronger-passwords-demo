@@ -11,7 +11,7 @@ import java.time.temporal.TemporalAmount;
 import java.util.Optional;
 import java.util.UUID;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
 
 @Component
 @RequiredArgsConstructor
@@ -31,26 +31,22 @@ class SecureRandomAlphanumericOneTimeTokenProvider implements OneTimeTokenProvid
 
     @Override
     public Optional<UUID> use(String token) {
-        try {
-            Optional<OneTimeToken> oneTimeToken = repository.findById(token);
-            oneTimeToken.ifPresent(repository::delete);
-            return oneTimeToken.map(it -> {
-                if (isValid(it)) {
-                    return it.getUserId();
-                } else {
-                    return null;
-                }
-            });
-        } finally {
-            repository.deleteById(token);
-        }
+        Optional<OneTimeToken> oneTimeToken = repository.findById(token);
+        oneTimeToken.ifPresent(repository::delete);
+        return oneTimeToken.map(it -> {
+            if (isValid(it)) {
+                return it.getUserId();
+            } else {
+                return null;
+            }
+        });
     }
 
     private Boolean isValid(OneTimeToken token) {
-        return token.getCreatedAt().plus(tokenLifespan).isBefore(Instant.now());
+        return token.getCreatedAt().plus(tokenLifespan).isAfter(Instant.now());
     }
 
-    @Scheduled(fixedRate = 30, timeUnit = SECONDS)
+    @Scheduled(fixedRate = 30, timeUnit = MINUTES)
     private void cleanOutdatedTokens() {
         repository.deleteByCreatedAtBefore(Instant.now().minus(tokenLifespan));
     }

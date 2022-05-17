@@ -1,14 +1,14 @@
 package pl.recompiled.springstrongerpasswordsdemo;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import pl.recompiled.springstrongerpasswordsdemo.token.OneTimeTokenProvider;
 
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
@@ -20,12 +20,20 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
+    private final PasswordValidatorService passwordValidatorService;
+    private final OneTimeTokenProvider oneTimeTokenProvider;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-                .userDetailsService(userService)
-                .passwordEncoder(passwordEncoder);
+        PasswordStrengthCheckingAuthenticationProvider authenticationProvider =
+                new PasswordStrengthCheckingAuthenticationProvider(passwordValidatorService);
+        authenticationProvider.setPasswordEncoder(passwordEncoder);
+        authenticationProvider.setUserDetailsService(userService);
+        auth.authenticationProvider(authenticationProvider);
+
+        // user with weak password, just for test
+        // todo: remove
+        userService.createUser(new CreateUserDto("user0", "weakPassword"));
     }
 
     @Override
@@ -34,19 +42,20 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/login*").permitAll()
                 .antMatchers("/users").permitAll()
+                .antMatchers("/home").permitAll()
+                .antMatchers("/change-password*").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
                 .loginPage("/login")
-                .successHandler((req, resp, auth) -> resp.setStatus(OK.value()))
-                .failureHandler((req, resp, auth) -> resp.setStatus(UNAUTHORIZED.value()))
+                .successHandler(new CustomAuthenticationSuccessHandler())
+                .failureHandler(new CustomAuthenticationFailureHandler(oneTimeTokenProvider))
                 .and()
                 .exceptionHandling()
-                .authenticationEntryPoint((req, resp, ex) -> resp.setStatus(UNAUTHORIZED.value()))
+                .authenticationEntryPoint((req, resp, ex) -> resp.sendRedirect("/login"))
                 .and()
                 .logout()
                 .and()
                 .csrf().disable();
     }
-
 }

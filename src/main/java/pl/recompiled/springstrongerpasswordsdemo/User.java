@@ -1,9 +1,6 @@
 package pl.recompiled.springstrongerpasswordsdemo;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.With;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,6 +23,7 @@ class User implements UserDetails {
     private boolean isNew;
     @Column(unique = true)
     private String username;
+    @Setter
     private String password;
 
     public static User newInstance(String username,
@@ -34,14 +32,6 @@ class User implements UserDetails {
         user.id = UUID.randomUUID();
         user.isNew = true;
         user.username = username;
-        user.password = password;
-        return user;
-    }
-
-    public User withPassword(String password) {
-        final User user = new User();
-        user.id = this.id;
-        user.username = this.username;
         user.password = password;
         return user;
     }

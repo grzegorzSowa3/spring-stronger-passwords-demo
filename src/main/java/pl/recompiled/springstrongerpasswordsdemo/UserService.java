@@ -7,9 +7,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.recompiled.springstrongerpasswordsdemo.token.OneTimeTokenProvider;
 
-import java.util.Optional;
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
@@ -28,8 +25,9 @@ public class UserService implements UserDetailsService {
     public void changePassword(ChangePasswordDto dto) {
         final User user = ottProvider.use(dto.getToken())
                 .flatMap(userRepository::findById)
-                .orElseThrow(() -> new RuntimeException("Token invalid!"));
-        userRepository.save(user.withPassword(passwordEncoder.encode(dto.getPassword())));
+                .orElseThrow(PasswordChangeTokenInvalidException::new);
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        userRepository.save(user);
     }
 
     @Override
