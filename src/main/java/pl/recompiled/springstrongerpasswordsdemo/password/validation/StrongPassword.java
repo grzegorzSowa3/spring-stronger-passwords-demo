@@ -1,4 +1,4 @@
-package pl.recompiled.springstrongerpasswordsdemo;
+package pl.recompiled.springstrongerpasswordsdemo.password.validation;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

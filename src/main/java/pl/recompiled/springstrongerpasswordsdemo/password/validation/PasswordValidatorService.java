@@ -1,14 +1,12 @@
-package pl.recompiled.springstrongerpasswordsdemo;
+package pl.recompiled.springstrongerpasswordsdemo.password.validation;
 
-import lombok.Data;
 import org.passay.*;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
-import java.util.List;
 
 @Component
-class PasswordValidatorService {
+public class PasswordValidatorService {
 
     public ValidationResult isValid(String password) {
         PasswordValidator validator = new PasswordValidator(Arrays.asList(
@@ -23,12 +21,6 @@ class PasswordValidatorService {
                 new WhitespaceRule()));
 
         RuleResult ruleResult = validator.validate(new PasswordData(password));
-        return new ValidationResult(ruleResult, validator.getMessages(ruleResult));
+        return new ValidationResult(ruleResult.isValid(), validator.getMessages(ruleResult));
     }
-}
-
-@Data
-class ValidationResult {
-    private final RuleResult ruleResult;
-    private final List<String> messages;
 }

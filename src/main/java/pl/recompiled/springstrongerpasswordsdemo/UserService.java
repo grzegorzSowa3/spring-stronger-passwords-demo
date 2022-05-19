@@ -5,6 +5,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import pl.recompiled.springstrongerpasswordsdemo.password.ChangePasswordDto;
+import pl.recompiled.springstrongerpasswordsdemo.password.PasswordChangeTokenInvalidException;
 import pl.recompiled.springstrongerpasswordsdemo.token.OneTimeTokenProvider;
 
 @Service

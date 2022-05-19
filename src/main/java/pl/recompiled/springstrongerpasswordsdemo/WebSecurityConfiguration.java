@@ -2,16 +2,13 @@ package pl.recompiled.springstrongerpasswordsdemo;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import pl.recompiled.springstrongerpasswordsdemo.password.validation.PasswordValidatorService;
 import pl.recompiled.springstrongerpasswordsdemo.token.OneTimeTokenProvider;
-
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @Configuration
 @RequiredArgsConstructor
@@ -44,6 +41,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/users").permitAll()
                 .antMatchers("/home").permitAll()
                 .antMatchers("/change-password*").permitAll()
+                .antMatchers("/password-lists*").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()

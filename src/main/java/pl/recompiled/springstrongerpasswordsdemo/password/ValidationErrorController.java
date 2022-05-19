@@ -1,4 +1,4 @@
-package pl.recompiled.springstrongerpasswordsdemo;
+package pl.recompiled.springstrongerpasswordsdemo.password;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
