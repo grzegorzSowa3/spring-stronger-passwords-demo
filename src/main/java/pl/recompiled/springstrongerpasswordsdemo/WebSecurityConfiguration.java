@@ -41,7 +41,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/users").permitAll()
                 .antMatchers("/home").permitAll()
                 .antMatchers("/change-password*").permitAll()
-                .antMatchers("/password-lists*").permitAll()
+                .antMatchers("/frequent-passwords*").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
